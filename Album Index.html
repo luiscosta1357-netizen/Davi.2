@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nosso Álbum Digital</title>
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --card-bg: #161b22;
+            --accent-color: #ff4b5c;
+            --text-color: #c9d1d9;
+            --border-color: #30363d;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* 1. Animação da Carta de Abertura */
+        .envelope-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(13, 17, 23, 0.95);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+
+        .letter-card {
+            background: var(--card-bg);
+            border: 2px solid var(--accent-color);
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 450px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+            cursor: pointer;
+            animation: dropDown 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes dropDown {
+            0% { transform: translateY(-100vh) rotate(-10deg); }
+            100% { transform: translateY(0) rotate(0deg); }
+        }
+
+        .seal-heart {
+            font-size: 40px;
+            color: var(--accent-color);
+            animation: pulse 1.5s infinite;
+            margin: 15px 0;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+            100% { transform: scale(1); }
+        }
+
+        /* 2. Conteúdo Principal do Álbum */
+        .main-content {
+            width: 90%;
+            max-width: 800px;
+            margin-top: 40px;
+            text-align: center;
+            display: none; /* Só aparece após abrir a carta */
+        }
+
+        .album-header {
+            margin-bottom: 40px;
+        }
+
+        .album-header h1 {
+            color: var(--accent-color);
+            font-size: 2.5rem;
+            margin-bottom: 5px;
+        }
+
+        /* 3. Contador de Namoro */
+        .counter-box {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 40px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .counter-grid {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 15px;
+        }
+
+        .counter-item span {
+            display: block;
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+
+        /* 4. Player de Música Minimalista */
+        .music-box {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 15px;
+            border-radius: 30px;
+            margin-bottom: 40px;
+            display: inline-flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        /* 5. Upload e Exibição Dinâmica de Fotos */
+        .upload-section {
+            margin-bottom: 40px;
+        }
+
+        .custom-file-upload {
+            border: 2px dashed var(--accent-color);
+            display: inline-block;
+            padding: 15px 30px;
+            cursor: pointer;
+            border-radius: 10px;
+            background: var(--card-bg);
+            transition: 0.3s;
+        }
+
+        .custom-file-upload:hover {
+            background: rgba(255, 75, 92, 0.1);
+        }
+
+        #file-input { display: none; }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .gallery-item {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+        }
+
+        /* 6. Rodapé com Mensagem Final */
+        .footer-message {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 60px;
+            font-style: italic;
+        }
+
+        .signature {
+            margin-top: 15px;
+            display: block;
+            font-weight: bold;
+            color: var(--accent-color);
+            font-style: normal;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 1. TELA DA CARTA DE ABERTURA -->
+    <div class="envelope-container" id="envelope">
+        <div class="letter-card" onclick="abrirCarta()">
+            <h2 style="color: var(--accent-color);">Para Quem? ❤️</h2>
+            <p>Uma carta especial caiu do céu para você. Toque no laço de coração para abrir o nosso álbum.</p>
+            <div class="seal-heart">💝</div>
+            <div id="carta-texto" style="display:none; text-align: left; margin-top: 20px; border-top: 1px solid #30363d; padding-top: 15px;">
+                <p><strong>Minha Carta de Abertura:</strong></p>
+                <p>Escreva aqui a sua mensagem romântica personalizada. Este texto aparecerá assim que o laço se desfazer ao toque.</p>
+                <button style="background: var(--accent-color); color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; width: 100%; margin-top: 15px;">Entrar no Álbum</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. CONTEÚDO DO ÁLBUM -->
+    <div class="main-content" id="album-content">
+        <div class="album-header">
+            <h1>Título do Nosso Álbum</h1>
+            <p>Criado com amor em Catanduva, SP</p>
+        </div>
+
+        <!-- Player de Música -->
+        <div class="music-box">
+            <span>🎵 Trilha Sonora:</span>
+            <audio id="bg-music" loop controls>
+                <source src="sua-musica.mp3" type="audio/mpeg">
+            </audio>
+        </div>
+
+        <!-- Contador do Namoro -->
+        <div class="counter-box">
+            <h3>Tempo Juntos</h3>
+            <div class="counter-grid">
+                <div class="counter-item"><span id="days">00</span>Dias</div>
+                <div class="counter-item"><span id="hours">00</span>Horas</div>
+                <div class="counter-item"><span id="minutes">00</span>Minutos</div>
+                <div class="counter-item"><span id="seconds">00</span>Segundos</div>
+            </div>
+        </div>
+
+        <!-- Seção de Seleção de Fotos -->
+        <div class="upload-section">
+            <label class="custom-file-upload">
+                <input type="file" id="file-input" multiple accept="image/*" onchange="carregarFotos(event)">
+                📸 Escolher várias fotos de uma vez
+            </label>
+        </div>
+
+        <!-- Grade de Fotos Carregadas -->
+        <div class="gallery-grid" id="gallery">
+            <!-- As fotos aparecerão aqui dinamicamente -->
+        </div>
+
+        <!-- Mensagem Final -->
+        <div class="footer-message">
+            <p>"Escreva aqui qualquer mensagem final que você queira dizer para fechar o álbum com chave de ouro."</p>
+            <span class="signature">— Sua Assinatura</span>
+        </div>
+    </div>
+
+    <script>
+        // Configuração da data inicial do namoro (Ano, Mês [0-11], Dia, Hora, Minuto)
+        // Altere para a data real do seu relacionamento
+        const dataInicio = new Date(2024, 10, 24, 20, 0, 0); 
+
+        function abrirCarta() {
+            const texto = document.getElementById('carta-texto');
+            if(texto.style.display === 'none') {
+                texto.style.display = 'block';
+                // Tenta dar o play automático na música ao interagir com a tela
+                document.getElementById('bg-music').play().catch(() => {});
+            } else {
+                document.getElementById('envelope').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('envelope').style.display = 'none';
+                    document.getElementById('album-content').style.display = 'block';
+                }, 500);
+            }
+        }
+
+        // Sistema dinâmico para renderizar várias fotos selecionadas localmente
+        function carregarFotos(event) {
+            const gallery = document.getElementById('gallery');
+            const files = event.target.files;
+            
+            for(let i = 0; i < files.length; i++) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const item = document.createElement('div');
+                    item.className = 'gallery-item';
+                    item.innerHTML = `<img src="${e.target.result}" alt="Foto do Álbum">`;
+                    gallery.appendChild(item);
+                }
+                reader.readAsDataURL(files[i]);
+            }
+        }
+
+        // Lógica do Contador de Tempo Ativo
+        function atualizarContador() {
+            const agora = new Date();
+            const diferenca = agora - dataInicio;
+
+            const dias = Math.floor(diferenca / (1000 * 60 * 60 * 24));
+            const horas = Math.floor((diferenca % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutos = Math.floor((diferenca % (1000 * 60 * 60)) / (1000 * 60));
