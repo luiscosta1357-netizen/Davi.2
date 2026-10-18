@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Criar álbum virtual</title>
+<link href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Figtree:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f6f2f8;--card:#fff;--ink:#241a2e;--mute:#6d6277;--line:#e3dbe9;--rose:#e0476f;
+--serif:"Young Serif",Georgia,serif;--sans:"Figtree",system-ui,sans-serif;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#181220;--card:#241b2f;--ink:#f3eef7;--mute:#a99dba;--line:#382c47;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#181220;--card:#241b2f;--ink:#f3eef7;--mute:#a99dba;--line:#382c47;color-scheme:dark}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font:16px/1.5 var(--sans)}
+[hidden]{display:none!important}
+button,input,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--rose);outline-offset:2px}
+main{max-width:560px;margin:0 auto;padding:28px 18px 190px}
+h1{font:400 clamp(30px,8vw,40px)/1.1 var(--serif);margin:0 0 8px}
+.lead{color:var(--mute);margin:0 0 24px}
+fieldset{border:0;padding:0;margin:0 0 26px}
+legend{font:400 20px var(--serif);padding:0;margin-bottom:10px}
+label{display:block;font-weight:600;font-size:14px;margin:12px 0 4px}
+input[type=text],input[type=date],input[type=time],textarea{width:100%;padding:12px 14px;border:1.5px solid var(--line);border-radius:12px;background:var(--card)}
+textarea{min-height:110px;resize:vertical}
+.row{display:grid;grid-template-columns:1.6fr 1fr;gap:10px}
+.drop{display:flex;flex-direction:column;align-items:center;gap:4px;padding:24px 16px;border:2px dashed var(--rose);border-radius:18px;text-align:center;cursor:pointer;background:var(--card);margin:0}
+.drop b{font:400 18px var(--serif)}.drop span{color:var(--mute);font-size:14px;font-weight:400}
+.drop input{display:none}
+#list{list-style:none;margin:14px 0 0;padding:0;display:grid;gap:10px}
+.item{display:grid;grid-template-columns:72px 1fr auto;gap:10px;align-items:center;padding:8px;border:1.5px solid var(--line);border-radius:14px;background:var(--card)}
+.item img{width:72px;height:72px;object-fit:cover;border-radius:8px}
+.item input{padding:8px 10px;font-size:14px}
+.ctl{display:flex;flex-direction:column;gap:2px}
+.ctl button{width:34px;height:30px;border:0;border-radius:8px;background:var(--line);cursor:pointer}
+.ctl button:hover{background:var(--rose);color:#fff}
+.bar{position:fixed;left:0;right:0;bottom:0;padding:12px 18px calc(12px + env(safe-area-inset-bottom,0px));background:var(--bg);border-top:1px solid var(--line)}
+.bar>div{max-width:560px;margin:0 auto;display:grid;gap:8px}
+.cta,.sec{width:100%;padding:14px;border-radius:999px;font-weight:600;font-size:16px;cursor:pointer}
+.cta{border:0;background:var(--rose);color:#fff}
+.sec{border:2px solid var(--rose);background:transparent;color:var(--rose)}
+.cta:disabled,.sec:disabled{opacity:.4;cursor:not-allowed}
+.hint{font-size:13px;color:var(--mute);margin:0;text-align:center}
+#pv{position:fixed;inset:0;z-index:20;background:#120c19}
+#pv iframe{width:100%;height:100%;border:0}
+#pvb{position:absolute;left:12px;top:calc(10px + env(safe-area-inset-top,0px));z-index:2;border:0;border-radius:999px;padding:8px 14px;background:rgba(255,255,255,.18);color:#fff;cursor:pointer}
+</style>
+</head>
+<body>
+<main>
+  <h1>Monte seu álbum</h1>
+  <p class="lead">Ao final você baixa um arquivo único, com fotos, música, contador e animações dentro. Dá para guardar e enviar a quem quiser.</p>
+
+  <fieldset>
+    <legend>Capa</legend>
+    <label for="title">Título</label>
+    <input type="text" id="title" value="Nossa história" maxlength="40">
+    <label for="to">Para quem?</label>
+    <input type="text" id="to" placeholder="Ex.: Ana" maxlength="40">
+  </fieldset>
+
+  <fieldset>
+    <legend>Carta de abertura (opcional)</legend>
+    <label for="letter">Escreva sua carta</label>
+    <textarea id="letter" style="min-height:170px" placeholder="Meu amor, preparei este álbum para guardar nossos melhores momentos…"></textarea>
+    <label for="seal">Iniciais no lacre</label>
+    <input type="text" id="seal" value="D&amp;M" maxlength="5">
+    <p class="hint" style="text-align:left;margin-top:6px">Ela cai do céu presa por um laço em forma de coração. Ao tocar, o laço se desfaz e a carta se abre, antes do álbum.</p>
+  </fieldset>
+
+  <fieldset>
+    <legend>Contador do namoro</legend>
+    <div class="row">
+      <div><label for="date">Início do namoro</label><input type="date" id="date" value="2024-12-02"></div>
+      <div><label for="time">Hora (opcional)</label><input type="time" id="time"></div>
+    </div>
+    <p class="hint" style="text-align:left;margin-top:6px">A data e a hora definem o contador e o mapa do céu (Catanduva, SP) na contracapa. Sem hora, usamos 20h para o mapa.</p>
+  </fieldset>
+
+  <fieldset>
+    <legend>Fotos</legend>
+    <label class="drop" for="files"><b>Escolher fotos</b><span>Você pode selecionar várias de uma vez</span>
+      <input type="file" id="files" accept="image/*" multiple></label>
+    <ul id="list"></ul>
+  </fieldset>
+
+  <fieldset>
+    <legend>Mensagem final</legend>
+    <label for="msg">Escreva o que quiser dizer</label>
+    <textarea id="msg" placeholder="Cada momento com você é o meu favorito."></textarea>
+    <label for="sign">Assinatura</label>
+    <input type="text" id="sign" placeholder="Com amor, Pedro" maxlength="40">
+  </fieldset>
+
+  <fieldset>
+    <legend>Música (opcional)</legend>
+    <label class="drop" for="mus"><b id="musName">Escolher uma música</b><span>Arquivo de áudio. Quanto mais leve, menor o álbum.</span>
+      <input type="file" id="mus" accept="audio/*"></label>
+  </fieldset>
+
+  <div class="bar"><div>
+    <button class="cta" id="dl" disabled>Baixar álbum</button>
+    <button class="sec" id="prev" disabled>Pré-visualizar</button>
+    <p class="hint" id="hint">Adicione pelo menos uma foto.</p>
+  </div></div>
+</main>
+
+<div id="pv" hidden><button id="pvb">Voltar e editar</button><iframe id="pvf" allow="autoplay" title="Pré-visualização"></iframe></div>
+
+<!-- Álbum final: este bloco vira o arquivo baixado -->
+<template id="vt">
+<style>
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:radial-gradient(120% 90% at 50% 0%,#3a2a4d 0%,#1c1426 60%,#120c19 100%);color:#f3eef7;font:16px/1.5 Figtree,system-ui,sans-serif;overflow:hidden;touch-action:pan-y;padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px);display:flex;flex-direction:column;align-items:center}
+button{font:inherit;color:inherit}
+.top{width:100%;display:flex;justify-content:flex-end;padding:10px 12px;min-height:52px}
+#mute{background:rgba(255,255,255,.14);border:0;border-radius:999px;padding:8px 14px;color:#fff;cursor:pointer}
+.stage{flex:1;width:100%;display:flex;align-items:center;justify-content:center;perspective:1600px;min-height:0}
+#book{position:relative;width:min(92vw,400px);height:min(600px,calc(100vh - 160px));box-shadow:4px 2px 0 -1px #e6dfee,8px 4px 0 -2px #d5cce0,0 24px 50px rgba(0,0,0,.55);border-radius:6px 16px 16px 6px}
+.leaf{position:absolute;inset:0;transform-origin:left center;transition:transform .95s cubic-bezier(.45,.05,.25,1),opacity .2s}
+.leaf.t{transform:rotateY(-155deg);opacity:0;pointer-events:none;transition:transform .95s cubic-bezier(.45,.05,.25,1),opacity .45s .4s}
+.pg{position:absolute;inset:0;background:#f8f5fa;color:#241a2e;border-radius:6px 16px 16px 6px;box-shadow:inset 8px 0 12px -8px rgba(0,0,0,.3);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center;overflow:hidden}
+.cover{background:linear-gradient(160deg,#4a2a5e,#2a1838);color:#f6e7c4;border:1px solid #d6ad63;box-shadow:inset 10px 0 14px -8px rgba(0,0,0,.6);cursor:pointer}
+.cover::before{content:"";position:absolute;inset:12px;border:2px solid rgba(214,173,99,.45);border-radius:4px 12px 12px 4px}
+.cover h2{font:400 clamp(34px,10vw,48px)/1.08 "Young Serif",Georgia,serif;margin:0 0 18px;color:#d6ad63}
+.cover p{margin:4px 0;font:500 28px Caveat,"Segoe Script",cursive}
+.cover small{margin-top:26px;opacity:.75;font-size:13px}
+.count h3,.end h3{font:400 26px "Young Serif",Georgia,serif;margin:0 0 16px}
+.units{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%;position:relative;z-index:1}
+.u{background:#fff;border-radius:14px;padding:12px 4px;box-shadow:0 2px 8px rgba(0,0,0,.1)}
+.u b{display:block;font:400 34px/1.1 "Young Serif",Georgia,serif;color:#e0476f;font-variant-numeric:tabular-nums}
+.u span{font-size:13px;color:#6d6277}
+.since{font:700 26px/1.2 Caveat,"Segoe Script",cursive;margin:18px 0 0;position:relative;z-index:1}
+.hp{position:absolute;bottom:-24px;color:#e0476f;opacity:0;animation:up 7s linear infinite}
+@keyframes up{0%{transform:translateY(0);opacity:0}15%{opacity:.5}100%{transform:translateY(-640px);opacity:0}}
+.polaroid{margin:0;background:#fff;padding:12px 12px 6px;box-shadow:0 8px 22px rgba(0,0,0,.25);transform:rotate(var(--r,-2deg));position:relative;max-width:100%}
+.polaroid::before{content:"";position:absolute;top:-12px;left:50%;width:84px;height:24px;margin-left:-42px;background:rgba(224,71,111,.35);transform:rotate(3deg)}
+.polaroid img{display:block;max-width:100%;max-height:calc(100vh - 400px);min-height:140px;object-fit:contain;background:#eee;margin:0 auto}
+.cap{font:700 28px/1.1 Caveat,"Segoe Script",cursive;padding:10px 4px 6px;min-height:34px;overflow-wrap:anywhere}
+.num{position:absolute;bottom:12px;right:16px;font:500 20px Caveat,"Segoe Script",cursive;color:#8a7d97}
+.end p{font:500 28px/1.25 Caveat,"Segoe Script",cursive;margin:0;white-space:pre-wrap;overflow-wrap:anywhere;max-height:62%;overflow:auto}
+.end em{display:block;margin-top:20px;font:700 30px Caveat,"Segoe Script",cursive;color:#e0476f;font-style:normal}
+.nav{display:flex;align-items:center;gap:18px;padding:14px 0 18px}
+.nav button{width:50px;height:50px;border-radius:50%;border:0;background:#e0476f;color:#fff;font-size:22px;cursor:pointer}
+.nav button:disabled{opacity:.3}
+#cnt{min-width:64px;text-align:center;font-size:14px;opacity:.8}
+[hidden]{display:none!important}
+#intro{position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;transition:opacity .7s;background:radial-gradient(1.5px 1.5px at 12% 18%,#fff 50%,transparent),radial-gradient(1.5px 1.5px at 80% 12%,#fff 50%,transparent),radial-gradient(2px 2px at 65% 30%,#fff 50%,transparent),radial-gradient(1.5px 1.5px at 25% 40%,#fff 50%,transparent),radial-gradient(1.5px 1.5px at 90% 45%,#fff 50%,transparent),radial-gradient(2px 2px at 8% 72%,#fff 50%,transparent),radial-gradient(1.5px 1.5px at 50% 7%,#fff 50%,transparent),radial-gradient(120% 90% at 50% 0%,#3a2a4d 0%,#1c1426 60%,#120c19 100%)}
+#intro.out{opacity:0}
+.env{position:relative;width:min(80vw,300px);aspect-ratio:3/2;background:#f6eef3;border-radius:8px;box-shadow:0 20px 50px rgba(0,0,0,.55);cursor:pointer;animation:fall 2.8s cubic-bezier(.3,.7,.3,1) both;perspective:600px}
+.flap{position:absolute;left:0;right:0;top:0;height:62%;background:#e8d9e3;clip-path:polygon(0 0,100% 0,50% 100%);transform-origin:top;transition:transform .7s .6s}
+.env.open .flap{transform:rotateX(180deg)}
+.rv,.rh{position:absolute;background:#e0476f;box-shadow:0 0 0 1px #c42f58;transition:transform .6s .15s,opacity .5s .3s}
+.rv{left:50%;top:0;bottom:0;width:24px;margin-left:-12px}
+.rh{top:50%;left:0;right:0;height:24px;margin-top:-12px}
+.env.open .rv{transform:scaleY(0);opacity:0}
+.env.open .rh{transform:scaleX(0);opacity:0}
+.bw{position:absolute;left:50%;top:50%;width:112px;height:101px;margin:-52px 0 0 -56px;overflow:visible;transition:transform .9s ease-in,opacity .9s ease-in;filter:drop-shadow(0 3px 4px rgba(0,0,0,.3))}
+.env.open .bl{transform:translate(-100px,-60px) rotate(-40deg);opacity:0}
+.env.open .br{transform:translate(100px,-60px) rotate(40deg);opacity:0}
+.env.open .bk{transform:scale(0);opacity:0}
+.tip{margin:30px 0 0;font:700 26px Caveat,"Segoe Script",cursive;color:#f6e7c4;animation:pulse 1.8s ease-in-out 2.8s infinite;opacity:0;animation-fill-mode:both}
+@keyframes fall{0%{transform:translateY(-110vh) rotate(-18deg)}55%{transform:translateY(10px) rotate(6deg)}75%{transform:translateY(-8px) rotate(-3deg)}100%{transform:none}}
+@keyframes pulse{0%,100%{opacity:.45}50%{opacity:1}}
+.ltr{width:min(92vw,400px);max-height:calc(100vh - 150px);overflow:auto;background:#f8f5fa;color:#241a2e;border-radius:8px;padding:30px 26px;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,.55);animation:pop .8s ease both}
+.ltr h3{font:400 26px "Young Serif",Georgia,serif;margin:0 0 14px}
+.ltr p{font:500 27px/1.25 Caveat,"Segoe Script",cursive;margin:0;white-space:pre-wrap;overflow-wrap:anywhere;text-align:left}
+.ltr em{display:block;margin-top:16px;font:700 30px Caveat,"Segoe Script",cursive;color:#e0476f;font-style:normal;text-align:right}
+#go{margin-top:22px;padding:14px 28px;border:0;border-radius:999px;background:#e0476f;color:#fff;font-weight:600;font-size:16px;cursor:pointer;animation:pop .8s .5s ease both}
+@keyframes pop{from{transform:translateY(30px) scale(.85);opacity:0}to{transform:none;opacity:1}}
+.bcov{background:linear-gradient(200deg,#1f2a55,#0d1230);color:#f6e7c4;border:1px solid #d6ad63;box-shadow:inset 10px 0 14px -8px rgba(0,0,0,.6);padding:20px 16px}
+.bcov::before{content:"";position:absolute;inset:12px;border:2px solid rgba(214,173,99,.45);border-radius:4px 12px 12px 4px;pointer-events:none}
+.bcov h3{font:400 24px "Young Serif",Georgia,serif;color:#d6ad63;margin:0 0 10px}
+.skyw{width:100%;max-width:300px}.skyw svg{display:block;width:100%;height:auto;max-height:calc(100vh - 410px);margin:0 auto}
+.bd{font:700 26px Caveat,"Segoe Script",cursive;margin:8px 0 0}.bd2{font:500 24px Caveat,"Segoe Script",cursive;margin:0;opacity:.9}
+.bcov small{margin-top:8px;font-size:11px;opacity:.65;max-width:250px}
+
+@media (prefers-reduced-motion:reduce){.leaf,.leaf.t{transition:opacity .3s}.hp{animation:none}.env{animation:none}.tip{animation:none;opacity:1}}
+</style>
+<div class="top"><button id="mute" hidden>♪ Música</button></div>
+<div class="stage"><div id="book"></div></div>
+<div class="nav"><button id="pv" aria-label="Página anterior">‹</button><span id="cnt"></span><button id="nx" aria-label="Próxima página">›</button></div>
+<div id="intro" hidden>
+<div class="env" id="env" role="button" tabindex="0" aria-label="Abrir a carta">
+<div class="flap"></div><div class="rv"></div><div class="rh"></div>
+<svg class="bw bl" viewBox="0 0 100 90" aria-hidden="true"><path d="M50 40C30 8 6 22 15 42C22 56 42 48 50 40Z" fill="#e0476f" stroke="#a8244a" stroke-width="3" stroke-linejoin="round"/><path d="M50 44L28 84L42 80L52 66Z" fill="#e0476f" stroke="#a8244a" stroke-width="3" stroke-linejoin="round"/></svg>
+<svg class="bw br" viewBox="0 0 100 90" aria-hidden="true"><path d="M50 40C70 8 94 22 85 42C78 56 58 48 50 40Z" fill="#e0476f" stroke="#a8244a" stroke-width="3" stroke-linejoin="round"/><path d="M50 44L72 84L58 80L48 66Z" fill="#e0476f" stroke="#a8244a" stroke-width="3" stroke-linejoin="round"/></svg>
+<svg class="bw bk" viewBox="0 0 100 90" aria-hidden="true"><circle cx="50" cy="42" r="17" fill="#8f1d3a" stroke="#5e1226" stroke-width="2.5"/><circle cx="50" cy="42" r="13" fill="none" stroke="#c4546f" stroke-width=".8"/><text id="sealt" x="50" y="46" text-anchor="middle" font-size="11" font-family="Young Serif,Georgia,serif" fill="#f6d5dc"></text></svg>
+</div>
+<p class="tip" id="tip">Toque na carta</p>
+<div class="ltr" id="ltr" hidden><h3 id="lh"></h3><p id="lt"></p><em id="ls"></em></div>
+<button id="go" hidden>Ver nosso álbum</button>
+</div>
+<audio id="aud" loop></audio>
+<script>
+(function(){
+var D=/*DATA*/null;
+document.title=D.title||'Nosso álbum';
+function $(i){return document.getElementById(i)}
+function h(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e}
+var book=$('book'),aud=$('aud'),builders=[],leaves=[],cur=0,units=[],since=null,st=null,started=false;
+var L=[['ano','anos'],['mês','meses'],['dia','dias'],['hora','horas'],['minuto','minutos'],['segundo','segundos']];
+
+if(D.start){var m=/(\d+)-(\d+)-(\d+)T(\d+):(\d+)/.exec(D.start);if(m)st=new Date(+m[1],+m[2]-1,+m[3],+m[4],+m[5])}
+
+builders.push(function(){
+  var p=h('div','pg cover');
+  p.append(h('h2',null,D.title||'Nosso álbum'));
+  if(D.to)p.append(h('p',null,'para '+D.to));
+  if(st)p.append(h('p',null,st.toLocaleDateString('pt-BR',{day:'numeric',month:'long',year:'numeric'})));
+  p.append(h('small',null,'Toque para abrir'));
+  return p});
+
+if(st)builders.push(function(){
+  var p=h('div','pg count');
+  for(var i=0;i<6;i++){var s=h('span','hp','♥');s.style.left=(8+i*16)+'%';s.style.animationDelay=(i*1.1)+'s';p.append(s)}
+  p.append(h('h3',null,'Estamos juntos há'));
+  var g=h('div','units');
+  L.forEach(function(){var u=h('div','u'),b=h('b','0'),s=h('span','');u.append(b,s);g.append(u);units.push([b,s])});
+  since=h('p','since');
+  p.append(g,since);tick();return p});
+
+D.photos.forEach(function(ph,i){builders.push(function(){
+  var p=h('div','pg'),f=h('figure','polaroid');
+  f.style.setProperty('--r',(i%2?2:-2)+'deg');
+  var im=h('img');im.src=ph.src;im.alt=ph.cap||('Foto '+(i+1));
+  f.append(im,h('div','cap',ph.cap||''));
+  p.append(f,h('span','num',(i+1)+' / '+D.photos.length));return p})});
+
+if(D.msg||D.sign)builders.push(function(){
+  var p=h('div','pg end');
+  p.append(h('h3',null,'Para você'));
+  if(D.msg)p.append(h('p',null,D.msg));
+  if(D.sign)p.append(h('em',null,D.sign));return p});
+
+var CAT=[['Sirius',6.752,-16.716,-1.46],['Canopus',6.399,-52.696,-0.74],['Arcturus',14.261,19.182,-0.05],['Rigil Kent',14.66,-60.834,-0.01],['Vega',18.616,38.784,0.03],['Capella',5.278,45.998,0.08],['Rigel',5.242,-8.202,0.13],['Procyon',7.655,5.225,0.34],['Achernar',1.629,-57.237,0.46],['Betelgeuse',5.919,7.407,0.5],['Hadar',14.064,-60.373,0.61],['Altair',19.846,8.868,0.77],['Acrux',12.443,-63.099,0.76],['Aldebaran',4.599,16.509,0.85],['Antares',16.49,-26.432,1.06],['Spica',13.42,-11.161,0.97],['Pollux',7.755,28.026,1.14],['Fomalhaut',22.961,-29.622,1.16],['Deneb',20.69,45.28,1.25],['Mimosa',12.795,-59.689,1.25],['Regulus',10.139,11.967,1.35],['Adhara',6.977,-28.972,1.5],['Castor',7.577,31.888,1.58],['Gacrux',12.519,-57.113,1.59],['Shaula',17.56,-37.104,1.62],['Bellatrix',5.419,6.35,1.64],['Elnath',5.438,28.608,1.65],['Miaplacidus',9.22,-69.717,1.67],['Alnilam',5.604,-1.202,1.69],['Alnitak',5.679,-1.943,1.74],['Alnair',22.137,-46.961,1.74],['Alioth',12.9,55.96,1.76],['Mirfak',3.405,49.861,1.79],['Dubhe',11.062,61.751,1.79],['Wezen',7.14,-26.393,1.84],['Kaus Australis',18.403,-34.385,1.85],['Sargas',17.622,-42.998,1.87],['Avior',8.375,-59.509,1.86],['Alkaid',13.792,49.313,1.86],['Menkalinan',5.992,44.948,1.9],['Atria',16.811,-69.028,1.92],['Alhena',6.629,16.399,1.93],['Peacock',20.427,-56.735,1.94],['Delta Vel',8.745,-54.709,1.96],['Mirzam',6.378,-17.956,1.98],['Alphard',9.46,-8.659,1.98],['Polaris',2.53,89.264,1.98],['Hamal',2.12,23.462,2],['Algieba',10.333,19.842,2.01],['Diphda',0.726,-17.987,2.04],['Nunki',18.921,-26.297,2.05],['Menkent',14.111,-36.37,2.06],['Mirach',1.162,35.621,2.05],['Alpheratz',0.139,29.091,2.06],['Rasalhague',17.582,12.56,2.07],['Kochab',14.845,74.156,2.08],['Saiph',5.796,-9.67,2.07],['Denebola',11.818,14.572,2.14],['Algol',3.136,40.956,2.1],['Tiaki',22.711,-46.885,2.1],['Almach',2.065,42.33,2.1],['Markab',23.079,15.205,2.49],['Scheat',23.063,28.083,2.42],['Algenib',0.22,15.184,2.83],['Enif',21.736,9.875,2.39],['Sadalsuud',21.526,-5.571,2.9],['Sadalmelik',22.096,-0.32,2.96],['Deneb Algedi',21.784,-16.127,2.87],['Dabih',20.35,-14.781,3.08],['Eltanin',17.943,51.489,2.23],['Sabik',17.173,-15.725,2.43],['Schedar',0.675,56.537,2.24],['Caph',0.153,59.15,2.27],['Gamma Cas',0.945,60.717,2.47],['Ruchbah',1.43,60.235,2.68],['Segin',1.907,63.67,3.37],['Meissa',5.586,9.934,3.4],['Mintaka',5.533,-0.299,2.23],['Hatysa',5.59,-5.91,2.8],['Zeta Tau',5.627,21.143,3],['Alcyone',3.79,24.105,2.87],['Cursa',5.131,-5.086,2.79],['Zaurak',3.967,-13.509,2.95],['Acamar',2.971,-40.3,2.9],['Ankaa',0.438,-42.306,2.4],['Menkar',3.038,4.09,2.53],['Arneb',5.545,-17.822,2.58],['Nihal',5.471,-20.759,2.84],['Phact',5.661,-34.074,2.64],['Aludra',7.402,-29.303,2.45],['Furud',6.338,-30.063,3],['Naos',8.06,-40.003,2.25],['Delta Cru',12.252,-58.749,2.8],['Mebsuta',6.732,25.131,3],['Tejat',6.383,22.514,2.9],['Sheratan',1.911,20.808,2.64],['Kaus Media',18.35,-29.828,2.7],['Kaus Borealis',18.466,-25.422,2.8],['Ascella',19.043,-29.88,2.6],['Alnasl',18.097,-30.424,2.98],['Dschubba',16.005,-22.622,2.3],['Graffias',16.091,-19.805,2.6],['Larawag',16.836,-34.293,2.3],['Lesath',17.512,-37.296,2.7],['Electra',3.747,24.113,3.7],['Maia',3.763,24.368,3.9],['Merope',3.772,23.948,4.2],['Taygeta',3.753,24.467,4.3],['Atlas',3.82,24.053,3.6],['Gamma Tau',4.33,15.628,3.65],['Theta Tau',4.478,15.87,3.4],['Epsilon Tau',4.477,19.18,3.5],['Alpha Tuc',22.308,-60.26,2.86],['Nashira',21.668,-16.662,3.7],['Algedi',20.3,-12.545,3.57]];
+var LINES=[['Meissa','Betelgeuse'],['Meissa','Bellatrix'],['Betelgeuse','Alnitak'],['Bellatrix','Mintaka'],['Alnitak','Alnilam'],['Alnilam','Mintaka'],['Alnitak','Saiph'],['Mintaka','Rigel'],['Sirius','Mirzam'],['Sirius','Wezen'],['Wezen','Adhara'],['Wezen','Aludra'],['Markab','Scheat'],['Scheat','Alpheratz'],['Alpheratz','Algenib'],['Algenib','Markab'],['Alpheratz','Mirach'],['Mirach','Almach'],['Caph','Schedar'],['Schedar','Gamma Cas'],['Gamma Cas','Ruchbah'],['Ruchbah','Segin'],['Acrux','Gacrux'],['Mimosa','Delta Cru'],['Antares','Dschubba'],['Dschubba','Graffias'],['Antares','Larawag'],['Larawag','Shaula'],['Shaula','Lesath'],['Kaus Australis','Kaus Media'],['Kaus Media','Kaus Borealis'],['Kaus Borealis','Nunki'],['Nunki','Ascella'],['Ascella','Kaus Media'],['Kaus Australis','Alnasl'],['Alnasl','Kaus Media']];
+var PL={earth:[1.00000261,0.01671123,-0.00001531,100.46457166,102.93768193,0,0.00000562,-0.00004392,-0.01294668,35999.37244981,0.32327364,0],
+venus:[0.72333566,0.00677672,3.39467605,181.9790995,131.60246718,76.67984255,0.0000039,-0.00004107,-0.0007889,58517.81538729,0.00268329,-0.27769418],
+mars:[1.52371034,0.0933941,1.84969142,-4.55343205,-23.94362959,49.55953891,0.00001847,0.00007882,-0.00813131,19140.30268499,0.44441088,-0.29257343],
+jupiter:[5.202887,0.04838624,1.30439695,34.39644051,14.72847983,100.47390909,-0.00011607,-0.00013253,-0.00183714,3034.74612775,0.21252668,0.20469106],
+saturn:[9.53667594,0.05386179,2.48599187,49.95424423,92.59887831,113.66242448,-0.0012506,-0.00050991,0.00193609,1222.49362201,-0.41897216,-0.28867794]};
+
+function skyCalc(utc,place){
+  var R=Math.PI/180,jd=utc/864e5+2440587.5,d=jd-2451545,T=d/36525,eps=23.43928*R;
+  var lst=(((280.46061837+360.98564736629*d+place.lon)%360)+360)%360;
+  function hor(ra,dec){
+    var H=(lst-ra)*R,de=dec*R,ph=place.lat*R;
+    var alt=Math.asin(Math.sin(ph)*Math.sin(de)+Math.cos(ph)*Math.cos(de)*Math.cos(H));
+    var az=Math.atan2(-Math.cos(de)*Math.sin(H),Math.sin(de)*Math.cos(ph)-Math.cos(de)*Math.sin(ph)*Math.cos(H));
+    return {alt:alt/R,az:((az/R)%360+360)%360}}
+  function helio(p){
+    var a=p[0]+p[6]*T,e=p[1]+p[7]*T,I=(p[2]+p[8]*T)*R,L=p[3]+p[9]*T,w=p[4]+p[10]*T,N=p[5]+p[11]*T;
+    var M=(((L-w)%360)+540)%360-180,Mr=M*R,E=Mr+e*Math.sin(Mr);
+    for(var i=0;i<10;i++)E=Mr+e*Math.sin(E);
+    var xp=a*(Math.cos(E)-e),yp=a*Math.sqrt(1-e*e)*Math.sin(E),om=(w-N)*R,Om=N*R;
+    var co=Math.cos(om),so=Math.sin(om),cO=Math.cos(Om),sO=Math.sin(Om),cI=Math.cos(I),sI=Math.sin(I);
+    return [(co*cO-so*sO*cI)*xp+(-so*cO-co*sO*cI)*yp,(co*sO+so*cO*cI)*xp+(-so*sO+co*cO*cI)*yp,so*sI*xp+co*sI*yp]}
+  function toEq(v){var y=Math.cos(eps)*v[1]-Math.sin(eps)*v[2],z=Math.sin(eps)*v[1]+Math.cos(eps)*v[2];
+    var ra=Math.atan2(y,v[0])/R;return {ra:(ra+360)%360,dec:Math.atan2(z,Math.sqrt(v[0]*v[0]+y*y))/R,v:[v[0],y,z]}}
+  var E0=helio(PL.earth),out={lst:lst};
+  var sunE=toEq([-E0[0],-E0[1],-E0[2]]);out.sun=sunE;out.sun.h=hor(sunE.ra,sunE.dec);
+  out.planets=[['Vênus','venus',-4],['Marte','mars',0],['Júpiter','jupiter',-2.5],['Saturno','saturn',0.8]].map(function(q){
+    var p=helio(PL[q[1]]),g=toEq([p[0]-E0[0],p[1]-E0[1],p[2]-E0[2]]);
+    return {name:q[0],mag:q[2],ra:g.ra,dec:g.dec,h:hor(g.ra,g.dec)}});
+  var s=function(x){return Math.sin(x*R)};
+  var Lm=218.316+13.176396*d,Mm=134.963+13.064993*d,F=93.272+13.22935*d,Dm=297.85+12.190749*d,Ms=357.529+0.9856*d;
+  var lon=Lm+6.289*s(Mm)+1.274*s(2*Dm-Mm)+0.658*s(2*Dm)+0.214*s(2*Mm)-0.186*s(Ms)-0.114*s(2*F)+0.059*s(2*Dm-2*Mm)+0.057*s(2*Dm-Ms-Mm)+0.053*s(Mm+2*Dm)+0.046*s(2*Dm-Ms)+0.041*s(Mm-Ms)-0.035*s(Dm)-0.03*s(Mm+Ms);
+  var lat=5.128*s(F)+0.281*s(Mm+F)+0.278*s(Mm-F)+0.173*s(2*Dm-F)+0.055*s(2*Dm+F-Mm)+0.046*s(2*Dm-F-Mm)+0.033*s(F+2*Dm);
+  var mv=[Math.cos(lat*R)*Math.cos(lon*R),Math.cos(lat*R)*Math.sin(lon*R),Math.sin(lat*R)],m=toEq(mv);
+  m.h=hor(m.ra,m.dec);m.h.alt-=0.95*Math.cos(m.h.alt*R);
+  var cs=m.v[0]*sunE.v[0]/Math.hypot.apply(null,sunE.v)+m.v[1]*sunE.v[1]/Math.hypot.apply(null,sunE.v)+m.v[2]*sunE.v[2]/Math.hypot.apply(null,sunE.v);
+  m.k=(1-cs)/2;m.elong=Math.acos(cs)/R;out.moon=m;out.hor=hor;return out}
+
+function skySVG(utc,place){
+  var R=Math.PI/180,c=skyCalc(utc,place),cx=150,cy=150,rad=128,o=[],by={};
+  function pr(h){var r=rad*(90-h.alt)/90,a=h.az*R;return [cx-r*Math.sin(a),cy-r*Math.cos(a)]}
+  function f(n){return n.toFixed(1)}
+  CAT.forEach(function(s){var h=c.hor(s[1]*15,s[2]);by[s[0]]={h:h,p:pr(h),m:s[3]}});
+  o.push('<svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Mapa do céu"><defs><radialGradient id="sg" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#0a0e2c"/><stop offset=".7" stop-color="#121a42"/><stop offset="1" stop-color="#26316a"/></radialGradient><clipPath id="sc"><circle cx="150" cy="150" r="128"/></clipPath><filter id="sb" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="7"/></filter></defs>');
+  o.push('<circle cx="150" cy="150" r="128" fill="url(#sg)"/>');
+  var d='',up=false;
+  for(var l=0;l<=360;l+=4){
+    var lr=l*R,bb=0,sd=Math.cos(122.932*R-lr)*Math.cos(27.128*R),dec=Math.asin(Math.sin(27.128*R)*0+sd)/R;
+    var ra=192.859+Math.atan2(Math.sin(122.932*R-lr),-Math.sin(27.128*R)*Math.cos(122.932*R-lr))/R;
+    var h=c.hor(((ra%360)+360)%360,dec);
+    if(h.alt>0){var p=pr(h);d+=(up?'L':'M')+f(p[0])+' '+f(p[1]);up=true}else up=false}
+  o.push('<g clip-path="url(#sc)"><path d="'+d+'" fill="none" stroke="#cfd8ff" stroke-opacity=".15" stroke-width="26" stroke-linecap="round" filter="url(#sb)"/></g>');
+  LINES.forEach(function(q){var a=by[q[0]],b=by[q[1]];
+    if(a&&b&&a.h.alt>0&&b.h.alt>0)o.push('<line x1="'+f(a.p[0])+'" y1="'+f(a.p[1])+'" x2="'+f(b.p[0])+'" y2="'+f(b.p[1])+'" stroke="#fff" stroke-opacity=".28" stroke-width=".7"/>')});
+  var LB={Sirius:'Sirius',Canopus:'Canopus',Achernar:'Achernar',Rigel:'Rigel',Betelgeuse:'Betelgeuse',Aldebaran:'Aldebarã',Fomalhaut:'Fomalhaut',Capella:'Capela',Alcyone:'Plêiades',Alnilam:'Órion',Acrux:'Cruzeiro do Sul',Procyon:'Procyon'};
+  var seen={};
+  Object.keys(by).forEach(function(k){var s=by[k];if(s.h.alt<=0.5)return;
+    var key=f(s.p[0])+f(s.p[1]);if(seen[key])return;seen[key]=1;
+    o.push('<circle cx="'+f(s.p[0])+'" cy="'+f(s.p[1])+'" r="'+Math.max(.6,2.3-.5*s.m).toFixed(2)+'" fill="#fff"/>');
+    if(LB[k]){var oo=k==='Aldebaran'?[4,12]:[5,-4];o.push('<text x="'+f(s.p[0]+oo[0])+'" y="'+f(s.p[1]+oo[1])+'" font-size="9" fill="#fff" fill-opacity=".72">'+LB[k]+'</text>')}});
+  var col={'Vênus':'#fff1c9','Marte':'#ff8f6b','Júpiter':'#ffdca0','Saturno':'#e9d49c'};
+  c.planets.forEach(function(q){if(q.h.alt<=0.5)return;var p=pr(q.h),r=q.mag<-2?3.8:2.8;
+    o.push('<circle cx="'+f(p[0])+'" cy="'+f(p[1])+'" r="'+(r*2.4).toFixed(1)+'" fill="'+col[q.name]+'" fill-opacity=".18"/><circle cx="'+f(p[0])+'" cy="'+f(p[1])+'" r="'+r+'" fill="'+col[q.name]+'"/><text x="'+f(p[0]+7)+'" y="'+f(p[1]+3)+'" font-size="10" font-weight="600" fill="'+col[q.name]+'">'+q.name+'</text>')});
+  var m=c.moon;
+  if(m.h.alt>-1){var pm=pr(m.h),ps=pr(c.sun.h),ang=Math.atan2(ps[1]-pm[1],ps[0]-pm[0])/R,k=m.k,rr=7,rx=rr*Math.abs(1-2*k);
+    o.push('<g transform="translate('+f(pm[0])+' '+f(pm[1])+') rotate('+f(ang)+')"><circle r="'+rr+'" fill="#2b3358"/><path d="M0 -'+rr+'A'+rr+' '+rr+' 0 0 1 0 '+rr+'A'+rx.toFixed(2)+' '+rr+' 0 0 '+(k<.5?0:1)+' 0 -'+rr+'Z" fill="#fff6d8"/></g><text x="'+f(pm[0]+11)+'" y="'+f(pm[1]+4)+'" font-size="10" font-weight="600" fill="#fff6d8">Lua</text>')}
+  o.push('<circle cx="150" cy="150" r="128" fill="none" stroke="#d6ad63" stroke-opacity=".7" stroke-width="1.3"/>');
+  [['N',150,12],['S',150,297],['L',7,154],['O',293,154]].forEach(function(t){o.push('<text x="'+t[1]+'" y="'+t[2]+'" font-size="12" font-weight="700" text-anchor="middle" fill="#f6e7c4">'+t[0]+'</text>')});
+  o.push('</svg>');return o.join('')}
+
+if(D.sky&&D.place){var mk=/(\d+)-(\d+)-(\d+)T(\d+):(\d+)/.exec(D.sky);if(mk)builders.push(function(){
+  var u=Date.UTC(+mk[1],+mk[2]-1,+mk[3],+mk[4]-D.place.tz,+mk[5]);
+  var p=h('div','pg bcov');
+  p.append(h('h3',null,'O céu do nosso começo'));
+  var w=h('div','skyw');w.innerHTML=skySVG(u,D.place);p.append(w);
+  var dt=new Date(+mk[1],+mk[2]-1,+mk[3]);
+  p.append(h('p','bd',dt.toLocaleDateString('pt-BR',{day:'numeric',month:'long',year:'numeric'})+' · '+(+mk[4])+'h'+(mk[5]!=='00'?mk[5]:'')));
+  p.append(h('p','bd2',D.place.name));
+  p.append(h('small',null,'Estrelas, Lua e planetas nas posições reais daquela noite.'));
+  return p})}
+
+function diff(a,b){
+  var y=b.getFullYear()-a.getFullYear(),mo=b.getMonth()-a.getMonth(),d=b.getDate()-a.getDate(),
+  hh=b.getHours()-a.getHours(),mi=b.getMinutes()-a.getMinutes(),s=b.getSeconds()-a.getSeconds();
+  if(s<0){s+=60;mi--}if(mi<0){mi+=60;hh--}if(hh<0){hh+=24;d--}
+  if(d<0){d+=new Date(b.getFullYear(),b.getMonth(),0).getDate();mo--}
+  if(mo<0){mo+=12;y--}
+  return [y,mo,d,hh,mi,s]}
+function tick(){
+  if(!st||!units.length)return;
+  var n=new Date();if(n<st)n=st;
+  var v=diff(st,n);
+  v.forEach(function(x,i){units[i][0].textContent=x;units[i][1].textContent=x===1?L[i][0]:L[i][1]});
+  var days=Math.floor((n-st)/864e5);
+  since.textContent=days+(days===1?' dia':' dias')+' de história';
+}
+setInterval(tick,1000);
+
+builders.forEach(function(b,i){
+  var l=h('div','leaf');l.style.zIndex=builders.length-i;l.append(b());book.append(l);leaves.push(l)});
+
+function ui(){
+  $('cnt').textContent=(cur+1)+' / '+leaves.length;
+  $('pv').disabled=cur===0;$('nx').disabled=cur===leaves.length-1}
+function music(){if(D.audio&&!started){started=true;aud.src=D.audio;aud.play().catch(function(){started=false});$('mute').hidden=false}}
+function next(){if(introOn||cur>=leaves.length-1)return;music();leaves[cur].classList.add('t');cur++;ui()}
+function prev(){if(introOn||cur<=0)return;cur--;leaves[cur].classList.remove('t');ui()}
+$('nx').onclick=next;$('pv').onclick=prev;
+leaves[0].addEventListener('click',function(){if(cur===0)next()});
+$('mute').onclick=function(){if(aud.paused){aud.play();$('mute').textContent='♪ Música'}else{aud.pause();$('mute').textContent='♪ Tocar'}};
+document.addEventListener('keydown',function(e){if(e.key==='ArrowRight')next();if(e.key==='ArrowLeft')prev()});
+var x0=null;
+document.addEventListener('touchstart',function(e){x0=e.touches[0].clientX},{passive:true});
+document.addEventListener('touchend',function(e){if(x0==null)return;var dx=e.changedTouches[0].clientX-x0;x0=null;if(Math.abs(dx)>50){dx<0?next():prev()}});
+ui();
+var introOn=!!D.letter;
+if(introOn){
+  var introEl=$('intro'),env=$('env'),opened=false;
+  introEl.hidden=false;
+  $('lh').textContent=D.to?'Para '+D.to:'Uma carta para você';
+  $('lt').textContent=D.letter;
+  $('sealt').textContent=D.seal||'';
+  $('ls').textContent=D.sign||'';
+  function openEnv(){
+    if(opened)return;opened=true;music();
+    $('tip').hidden=true;env.classList.add('open');
+    setTimeout(function(){env.hidden=true;$('ltr').hidden=false;$('go').hidden=false;$('go').focus()},1700)}
+  env.addEventListener('click',openEnv);
+  env.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();openEnv()}});
+  $('go').onclick=function(){introEl.classList.add('out');setTimeout(function(){introEl.hidden=true;introOn=false},700)};
+}
+})();
+</script>
+</template>
+
+<script>
+const $=id=>document.getElementById(id);
+const S={photos:[],audio:null,audioName:''};
+let dl=null;
+(async()=>{try{if(window.claude&&claude.use)dl=await claude.use('downloads')}catch(e){}})();
+
+function h(tag,cls,txt){const e=document.createElement(tag);if(cls)e.className=cls;if(txt!=null)e.textContent=txt;return e}
+const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+function shrink(file){return new Promise(res=>{const r=new FileReader();
+  r.onerror=()=>res(null);
+  r.onload=()=>{const im=new Image();im.onerror=()=>res(null);
+    im.onload=()=>{const s=Math.min(1,1100/Math.max(im.width,im.height));
+      const c=document.createElement('canvas');c.width=Math.round(im.width*s);c.height=Math.round(im.height*s);
+      c.getContext('2d').drawImage(im,0,0,c.width,c.height);res(c.toDataURL('image/jpeg',.85))};
+    im.src=r.result};
+  r.readAsDataURL(file)})}
+
+$('files').addEventListener('change',async e=>{
+  $('hint').textContent='Carregando fotos…';
+  for(const f of e.target.files){const src=await shrink(f);if(src)S.photos.push({src,cap:''})}
+  e.target.value='';renderList()});
+
+$('mus').addEventListener('change',e=>{
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=()=>{S.audio=r.result;S.audioName=f.name;
+    $('musName').textContent='♪ '+f.name+' ('+(f.size/1048576).toFixed(1)+' MB)'};
+  r.readAsDataURL(f)});
+
+function renderList(){
+  const ul=$('list');ul.textContent='';
+  S.photos.forEach((p,i)=>{
+    const li=h('li','item');li.dataset.i=i;
+    const img=h('img');img.src=p.src;img.alt='Foto '+(i+1);
+    const inp=h('input');inp.type='text';inp.placeholder='Legenda da foto '+(i+1);inp.value=p.cap;inp.maxLength=70;inp.dataset.i=i;
+    const ctl=h('div','ctl');
+    [['up','↑','Subir'],['down','↓','Descer'],['del','✕','Remover']].forEach(([a,t,l])=>{
+      const b=h('button',null,t);b.dataset.a=a;b.setAttribute('aria-label',l);b.type='button';ctl.append(b)});
+    li.append(img,inp,ctl);ul.append(li)});
+  const n=S.photos.length;
+  $('dl').disabled=$('prev').disabled=!n;
+  $('hint').textContent=n?n+(n===1?' foto adicionada.':' fotos adicionadas.'):'Adicione pelo menos uma foto.';
+}
+$('list').addEventListener('input',e=>{if(e.target.dataset.i!=null)S.photos[+e.target.dataset.i].cap=e.target.value});
+$('list').addEventListener('click',e=>{
+  const b=e.target.closest('button');if(!b)return;
+  const i=+b.closest('li').dataset.i,a=b.dataset.a,P=S.photos;
+  if(a==='del')P.splice(i,1);
+  if(a==='up'&&i>0)[P[i-1],P[i]]=[P[i],P[i-1]];
+  if(a==='down'&&i<P.length-1)[P[i+1],P[i]]=[P[i],P[i+1]];
+  renderList()});
+
+function makeHTML(){
+  const d=$('date').value,t=$('time').value||'00:00';
+  const D={title:$('title').value.trim()||'Nosso álbum',to:$('to').value.trim(),
+    start:d?d+'T'+t:'',sky:d?d+'T'+($('time').value||'20:00'):'',place:{name:'Catanduva, SP',lat:-21.1378,lon:-48.9728,tz:-3},letter:$('letter').value.trim(),seal:$('seal').value.trim(),msg:$('msg').value.trim(),sign:$('sign').value.trim(),photos:S.photos,audio:S.audio};
+  const j=JSON.stringify(D).replace(/</g,'\\u003c');
+  const body=$('vt').innerHTML.replace('/*DATA*/null',()=>j);
+  return '<!DOCTYPE html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><link href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Caveat:wght@500;700&family=Figtree:wght@400;600&display=swap" rel="stylesheet"><title>'+esc(D.title)+'</title></head><body>'+body+'</body></html>';
+}
+
+$('prev').onclick=()=>{$('pvf').srcdoc=makeHTML();$('pv').hidden=false};
+$('pvb').onclick=()=>{$('pv').hidden=true;$('pvf').srcdoc=''};
+
+$('dl').onclick=async()=>{
+  const slug=($('title').value||'album').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-zA-Z0-9]+/g,'-').replace(/^-|-$/g,'').toLowerCase()||'album';
+  const name=slug+'.html',blob=new Blob([makeHTML()],{type:'text/html'});
+  try{
+    if(dl){await dl.save({filename:name,data:blob});$('hint').textContent='Álbum salvo. Agora é só enviar o arquivo '+name+'.'}
+    else{const a=h('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.append(a);a.click();a.remove();
+      $('hint').textContent='Se o download não começou, abra esta página no navegador do celular ou computador.'}
+  }catch(e){
+    if(e&&e.code==='declined')return;
+    $('hint').textContent='Não foi possível salvar aqui. Abra esta página pelo claude.ai e tente de novo.'}
+};
+</script>
+</body>
+</html>
